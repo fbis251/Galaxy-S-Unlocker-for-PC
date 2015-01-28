@@ -23,10 +23,11 @@ import std.getopt;
 enum string NV_DATA_PATH  = "nv_data.bin";
 enum string UNLOCKED_PATH = "nv_data_unlocked.bin";
 enum string LOCKED_PATH   = "nv_data_locked.bin";
-enum uint   CODE_LOCATION = 0x1469;            // Magic byte location for lock status + ASCII code
+enum uint   MAGIC_OFFSET  = 0x1469;            // Magic byte location for lock status + ASCII code
+enum uint   END_OFFSET    = MAGIC_OFFSET + 13; // The offset of the last byte of the code
 enum uint   CODE_LENGTH   = 8;                 // How many bytes are the lock status + ASCII code?
-enum uint   CODE_OFFSET   = CODE_LOCATION + 5; // ASCII unlock code compared to CODE_LOCATION
-enum uint   LOCK_OFFSET   = CODE_LOCATION;     // Offset to the lock/unlock byte
+enum uint   CODE_OFFSET   = MAGIC_OFFSET + 5;  // ASCII unlock code comes 5 bytes after MAGIC_OFFSET
+enum uint   LOCK_OFFSET   = MAGIC_OFFSET;      // Offset for lock/unlock byte, same as MAGIC_OFFSET
 enum ubyte  UNLOCKED      = 0x0;               // 0 byte signifies the phone is unlocked
 enum ubyte  LOCKED        = 0x1;               // 1 byte signifies the phone is locked
 enum uint   FIRST_BYTE    = 0xFF;              // The first byte of the pattern, used for validation
@@ -174,12 +175,12 @@ ubyte[] readFile(string filename) {
 bool validateNvDataFile(ubyte[] nvDataBytes) {
 
     // Make sure that the file size is greater than the offset we'll look at
-    if (nvDataBytes.length < CODE_LOCATION + CODE_LENGTH) {
+    if (nvDataBytes.length < END_OFFSET) {
         return false;
     }
 
-    // The preceding byte is always 0xFF
-    if (nvDataBytes[CODE_LOCATION - 1] != FIRST_BYTE) {
+    // The preceding byte should always equal FIRST_BYTE (0xFF)
+    if (nvDataBytes[MAGIC_OFFSET - 1] != FIRST_BYTE) {
         return false;
     }
 
