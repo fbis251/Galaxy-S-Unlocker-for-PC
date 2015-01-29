@@ -1,6 +1,12 @@
 Galaxy S Unlocker for PC
 ========================
 
+Windows/Linux Download
+----------------------
+You can download a zip file containing binaries for Windows and Linux here:
+
+https://github.com/fbis251/Galaxy-S-Unlocker-for-PC/releases
+
 Description
 -----------
 
